@@ -187,11 +187,19 @@ export default function useEventPublisher() {
         return await signEvent(ev);
       }
     },
-    note: async (msg: string) => {
+    note: async (msg: string, extraTags?: Array<Tag>) => {
       if (pubKey) {
         const ev = NEvent.ForPubKey(pubKey);
         ev.Kind = EventKind.TextNote;
         processContent(ev, msg);
+        if (extraTags) {
+          for (const et of extraTags) {
+            const obj = et.ToObject();
+            if (obj) {
+              ev.Tags.push(new Tag(obj, ev.Tags.length));
+            }
+          }
+        }
         return await signEvent(ev);
       }
     },
@@ -213,7 +221,7 @@ export default function useEventPublisher() {
     /**
      * Reply to a note
      */
-    reply: async (replyTo: NEvent, msg: string) => {
+    reply: async (replyTo: NEvent, msg: string, extraTags?: Array<Tag>) => {
       if (pubKey) {
         const ev = NEvent.ForPubKey(pubKey);
         ev.Kind = EventKind.TextNote;
@@ -244,6 +252,14 @@ export default function useEventPublisher() {
           }
         }
         processContent(ev, msg);
+        if (extraTags) {
+          for (const et of extraTags) {
+            const obj = et.ToObject();
+            if (obj) {
+              ev.Tags.push(new Tag(obj, ev.Tags.length));
+            }
+          }
+        }
         return await signEvent(ev);
       }
     },
